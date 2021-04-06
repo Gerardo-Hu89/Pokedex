@@ -1,32 +1,56 @@
 import React, { useState, useEffect, ReactElement } from 'react';
+import { Row, Col, Table } from 'antd';
+import './styles.css';
 
-type PokeBasic = {
-  [key: string]: string;
-};
+const columns = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name',
+    render: (text:string) => <a>{text}</a>,
+  },
+  {
+    title: 'Height',
+    dataIndex: 'height',
+    key: 'height',
+  },
+  {
+    title: 'Weight',
+    dataIndex: 'weight',
+    key: 'weight',
+  },
+  {
+    title: 'Types',
+    dataIndex: 'types',
+    key: 'types',
+  },
+  {
+    title: 'Image',
+    dataIndex: 'image',
+    key: 'image',
+    render: (text:string) => <img alt="" src={text}/>,
+  }
+];
 
-type RowProps = {
-  ind: number;
-  obj: PokeBasic;
-};
-
-const PokemonRow = ({obj, ind}: RowProps): ReactElement => {
-  const [pokeImg, setPokeImg] = useState<string>();
+const PokemonTable = ({obj}: any): ReactElement => {
+  const [data, setData] = useState();
 
   useEffect(() => {
-    (async function() {
-      const data = await fetch(`https://pokeapi.co/api/v2/pokemon/${obj.name}`);
-      const pokemonImg = await data.json();
-      setPokeImg(pokemonImg.sprites.front_default);
-    })();
-  }, [obj.name]);
+    const data = obj.map((el:any, i:number) => {
+      return {
+        key: i,
+        name: el.name,
+        weight: el.weight,
+        height: el.height,
+        image: el.sprites.front_default,
+        types: el.types.map((el:any) => `${el.type.name} `)
+      }
+    });
+    setData(data);
+  }, [obj]);
 
   return (
-    <div>
-      <div>{obj.name}</div>
-      <div>
-        <img alt={obj.name} src={pokeImg} />
-      </div>
-    </div>
+    <Table columns={columns} dataSource={data} />
   );
 };
 
@@ -37,18 +61,27 @@ const PokedexList: React.FC<any> = (): ReactElement => {
 
   useEffect(() => {
     (async function () {
-      const data = await fetch(`https://pokeapi.co/api/v2/pokemon?offset=${page}&limit=${limit}`);
-      const pokemons = await data.json();
-      setData(pokemons.results);
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon?offset=${page}&limit=${limit}`);
+      const { results } = await response.json();
+      const statsSrc = [];
+      for(const el of results) {
+        statsSrc.push((await fetch(`https://pokeapi.co/api/v2/pokemon/${el.name}`)).json());
+      };
+      const statsArr = await Promise.all(statsSrc);
+      setData(statsArr);
+      // console.log(data);
     })();
-  }, [limit, page]);
+    return () => {};
+  }, [page, limit]);
 
   return (
-    <div>
-      {data && data.map((el: PokeBasic, i: number) => {
-        return <PokemonRow obj={el} ind={i} />
-      })}
-    </div>
+    <Row>
+      <Col sm={24} md={24} lg={24} xl={24} xxl={24}>
+        {data && <PokemonTable obj={data} />}
+      </Col>
+      {/*<Button>Prev</Button>
+      <Button>Next</Button>*/}
+    </Row>
   );
 };
 
