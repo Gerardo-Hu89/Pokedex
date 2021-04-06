@@ -5,8 +5,8 @@ type PokeBasic = {
 };
 
 type RowProps = {
-  obj: any;
-  ind: number
+  ind: number;
+  obj: PokeBasic;
 };
 
 const PokemonRow = ({obj, ind}: RowProps): ReactElement => {
@@ -45,7 +45,7 @@ const PokedexList: React.FC<any> = (): ReactElement => {
 
   return (
     <div>
-      {data && data.map((el: PokeBasic[], i: number) => {
+      {data && data.map((el: PokeBasic, i: number) => {
         return <PokemonRow obj={el} ind={i} />
       })}
     </div>
