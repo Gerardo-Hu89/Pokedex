@@ -42,7 +42,7 @@ const Pokedex = (): React.ReactElement => {
         >
           <PokedexList />
         </Content>
-        <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+        <Footer style={{ textAlign: 'center' }}>Pokedex practice ©2021 Created by Gera</Footer>
       </Layout>
     </Layout>
   );

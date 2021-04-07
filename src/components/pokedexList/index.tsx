@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ReactElement } from 'react';
-import { Row, Col, Table } from 'antd';
+import { Row, Col, Button, Table } from 'antd';
+import { capitalizeFirstLetter } from 'utils/misc';
 import './styles.css';
 
 const columns = [
@@ -37,20 +38,21 @@ const PokemonTable = ({obj}: any): ReactElement => {
 
   useEffect(() => {
     const data = obj.map((el:any, i:number) => {
+      console.log(el);
       return {
         key: i,
-        name: el.name,
         weight: el.weight,
         height: el.height,
         image: el.sprites.front_default,
-        types: el.types.map((el:any) => `${el.type.name} `)
+        name: capitalizeFirstLetter(el.name),
+        types: el.types.map((el:any, i:number) => capitalizeFirstLetter(el.type.name, i)).toString()
       }
     });
     setData(data);
   }, [obj]);
 
   return (
-    <Table columns={columns} dataSource={data} />
+    <Table pagination={false} columns={columns} dataSource={data} />
   );
 };
 
@@ -69,19 +71,24 @@ const PokedexList: React.FC<any> = (): ReactElement => {
       };
       const statsArr = await Promise.all(statsSrc);
       setData(statsArr);
-      // console.log(data);
     })();
     return () => {};
   }, [page, limit]);
 
   return (
-    <Row>
-      <Col sm={24} md={24} lg={24} xl={24} xxl={24}>
-        {data && <PokemonTable obj={data} />}
-      </Col>
-      {/*<Button>Prev</Button>
-      <Button>Next</Button>*/}
-    </Row>
+    <>
+      <Row>
+        <Col sm={24} md={24} lg={24} xl={24} xxl={24}>
+          {data && <PokemonTable obj={data} />}
+        </Col>
+      </Row>
+      <Row>
+        <Col style={{paddingTop:'25px', textAlign:'right'}} sm={24} md={24} lg={24} xl={24} xxl={24}>
+          <Button onClick={() => setPage(page-10)}>Prev</Button>
+          <Button onClick={() => setPage(page+10)}>Next</Button>
+        </Col>  
+      </Row>
+    </>
   );
 };
 
